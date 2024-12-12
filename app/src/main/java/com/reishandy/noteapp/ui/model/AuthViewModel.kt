@@ -1,6 +1,8 @@
 package com.reishandy.noteapp.ui.model
 
 import android.content.Context
+import android.database.sqlite.SQLiteConstraintException
+import android.util.Log
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.compose.runtime.getValue
@@ -8,12 +10,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.reishandy.noteapp.R
+import com.reishandy.noteapp.data.NoteAppDatabase
+import com.reishandy.noteapp.data.user.User
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CompletableJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.compose
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import java.security.MessageDigest
 
 enum class AuthFormState(@StringRes val title: Int) {
     Login(title = R.string.LOGIN),
@@ -34,9 +44,11 @@ data class AuthUiState(
     val dialogOnDismiss: () -> Unit = {}
 )
 
-class AuthViewModel : ViewModel() {
+class AuthViewModel(database: NoteAppDatabase) : ViewModel() {
     private val _uiState = MutableStateFlow(AuthUiState())
     val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
+
+    private val userDao = database.userDao()
 
     var username by mutableStateOf("")
         private set
@@ -44,7 +56,7 @@ class AuthViewModel : ViewModel() {
         private set
     var rePassword by mutableStateOf("")
         private set
-    
+
     // UPDATE
     fun updateUsername(newUsername: String) {
         username = newUsername
@@ -102,65 +114,154 @@ class AuthViewModel : ViewModel() {
     }
 
     // MAIN LOGIC
-    fun login(context: Context): Boolean {
-        // TODO: Implement login logic database
+    fun login(
+        context: Context,
+        onSuccess: () -> Unit
+    ) {
+        viewModelScope.launch {
+            val user = userDao.getUser(username)
 
-        _uiState.value = AuthUiState(user = username)
-        showToast(context, "Welcome back $username")
-        return true
+            if (user == null) {
+                _uiState.update { state ->
+                    state.copy(
+                        usernameError = "Username not found",
+                        passwordError = ""
+                    )
+                }
+                return@launch
+            }
+
+            if (user.password != hashPassword(password)) {
+                _uiState.update { state ->
+                    state.copy(
+                        usernameError = "",
+                        passwordError = "Incorrect password"
+                    )
+                }
+                return@launch
+            }
+
+            _uiState.value = AuthUiState(user = username)
+            showToast(context, "Welcome back $username")
+            onSuccess()
+        }
     }
 
-    fun register(context: Context): Boolean {
+    fun register(
+        context: Context,
+        onSuccess: () -> Unit
+    ) {
         if (!validatePassword()) {
-            return false
+            return
         }
 
-        // TODO: Implement register logic database
+        viewModelScope.launch {
+            try {
+                userDao.insert(
+                    User(
+                        username = username,
+                        password = hashPassword(password)
+                    )
+                )
 
-        changeAuthFormState(AuthFormState.Login)
-        showToast(context, "Account created successfully")
-        return true
+                changeAuthFormState(AuthFormState.Login)
+                showToast(context, "Account created successfully")
+                onSuccess()
+            } catch (e: SQLiteConstraintException) {
+                _uiState.update { state ->
+                    state.copy(
+                        usernameError = "Username already exists",
+                        passwordError = "",
+                        rePasswordError = ""
+                    )
+                }
+            }
+        }
+
     }
 
-    fun changeUsername(context: Context): Boolean {
+    fun changeUsername(
+        currentUsername: String,
+        context: Context,
+        onSuccess: () -> Unit
+    ) {
         // TODO: Implement change username logic database
+        viewModelScope.launch {
+            val user = userDao.getUser(currentUsername)
 
-        _uiState.value = AuthUiState(user = username)
-        showToast(context, "Username changed successfully to $username")
-        return true
+            if (user == null) {
+                showToast(context, "Something went wrong")
+                onSuccess()
+                return@launch
+            }
+
+            userDao.update(
+                oldUsername = user.username,
+                username = username,
+                password = user.password
+            )
+
+            _uiState.value = AuthUiState(user = username)
+            showToast(context, "Username changed successfully to $username")
+            onSuccess()
+        }
     }
 
-    fun changePassword(context: Context): Boolean {
+    fun changePassword(
+        currentUsername: String,
+        context: Context,
+        onSuccess: () -> Unit
+    ) {
         if (!validatePassword()) {
-            return false
+            return
         }
 
         // TODO: Implement change password logic database
+        viewModelScope.launch {
+            val user = userDao.getUser(currentUsername)
 
-        _uiState.update { state ->
-            state.copy(
-                passwordError = "",
-                rePasswordError = ""
+            if (user == null) {
+                showToast(context, "Something went wrong")
+                onSuccess()
+                return@launch
+            }
+
+            userDao.update(
+                oldUsername = user.username,
+                username = user.username,
+                password = hashPassword(password)
             )
+
+            _uiState.value = AuthUiState(user = currentUsername)
+            showToast(context, "Password changed successfully")
+            onSuccess()
         }
-        showToast(context, "Password changed successfully")
-        return true
     }
 
-    fun deleteAccount(context: Context): Boolean {
-        // TODO: Implement delete account logic database
+    fun deleteAccount(
+        currentUsername: String,
+        context: Context,
+        onSuccess: () -> Unit,
+        onFailed: () -> Unit
+    ) {
+        viewModelScope.launch {
+            val user = userDao.getUser(currentUsername)
 
-        if (false) { // if error TODO
-            showToast(context, "Failed to delete account")
-            return false
+            if (user == null) {
+                showToast(context, "Something went wrong")
+                onFailed()
+                return@launch
+            }
+
+            userDao.delete(user)
+            _uiState.value = AuthUiState()
+            showToast(context, "Account deleted successfully")
+            onSuccess()
         }
-
-        showToast(context, "Account deleted successfully")
-        return true
     }
 
     fun logout(context: Context) {
-        changeAuthFormState(AuthFormState.Login)
+        _uiState.value = AuthUiState()
         showToast(context, "Logged out successfully")
     }
 
@@ -195,5 +296,12 @@ class AuthViewModel : ViewModel() {
         }
 
         return true
+    }
+
+    fun hashPassword(password: String): String {
+        val bytes = password.toByteArray()
+        val md = MessageDigest.getInstance("SHA-256")
+        val digest = md.digest(bytes)
+        return digest.fold("") { str, it -> str + "%02x".format(it) }
     }
 }

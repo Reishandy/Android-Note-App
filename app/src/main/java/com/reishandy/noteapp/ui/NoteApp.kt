@@ -19,6 +19,7 @@ import com.reishandy.noteapp.ui.component.AuthForm
 import com.reishandy.noteapp.ui.component.MainMenu
 import com.reishandy.noteapp.ui.model.AuthFormState
 import com.reishandy.noteapp.ui.model.AuthViewModel
+import com.reishandy.noteapp.ui.model.AuthViewModelFactory
 
 enum class NoteAppNav() {
     Login,
@@ -31,7 +32,7 @@ enum class NoteAppNav() {
 @Composable
 fun NoteApp() {
     val context = LocalContext.current
-    val authViewModel: AuthViewModel = viewModel()
+    val authViewModel: AuthViewModel = viewModel(factory = AuthViewModelFactory(context))
     val navController: NavHostController = rememberNavController()
 
     val uiState by authViewModel.uiState.collectAsState()
@@ -53,10 +54,12 @@ fun NoteApp() {
                     passwordValue = authViewModel.password,
                     passwordOnValueChanged = { authViewModel.updatePassword(it) },
                     onSubmit = {
-                        val success = authViewModel.login(context)
-                        if (success) {
-                            navController.navigate(NoteAppNav.MainMenu.name)
-                        }
+                        authViewModel.login(
+                            context = context,
+                            onSuccess = {
+                                navController.navigate(NoteAppNav.MainMenu.name)
+                            }
+                        )
                     },
                     onChange = {
                         authViewModel.changeAuthFormState(AuthFormState.Register)
@@ -75,10 +78,12 @@ fun NoteApp() {
                     rePasswordValue = authViewModel.rePassword,
                     rePasswordOnValueChanged = { authViewModel.updateRePassword(it) },
                     onSubmit = {
-                        val success = authViewModel.register(context)
-                        if (success) {
-                            navController.navigate(NoteAppNav.Login.name)
-                        }
+                        authViewModel.register(
+                            context = context,
+                            onSuccess = {
+                                navController.navigate(NoteAppNav.Login.name)
+                            }
+                        )
                     },
                     onChange = {
                         authViewModel.changeAuthFormState(AuthFormState.Login)
@@ -93,10 +98,13 @@ fun NoteApp() {
                     usernameValue = authViewModel.username,
                     usernameOnValueChanged = { authViewModel.updateUsername(it) },
                     onSubmit = {
-                        val success = authViewModel.changeUsername(context)
-                        if (success) {
-                            navController.navigate(NoteAppNav.MainMenu.name)
-                        }
+                        authViewModel.changeUsername(
+                            currentUsername = uiState.user,
+                            context = context,
+                            onSuccess = {
+                                navController.navigate(NoteAppNav.MainMenu.name)
+                            }
+                        )
                     },
                     onCancel = {
                         navController.navigate(NoteAppNav.MainMenu.name)
@@ -112,10 +120,13 @@ fun NoteApp() {
                     rePasswordValue = authViewModel.rePassword,
                     rePasswordOnValueChanged = { authViewModel.updateRePassword(it) },
                     onSubmit = {
-                        val success = authViewModel.changePassword(context)
-                        if (success) {
-                            navController.navigate(NoteAppNav.MainMenu.name)
-                        }
+                        authViewModel.changePassword(
+                            currentUsername = uiState.user,
+                            context = context,
+                            onSuccess = {
+                                navController.navigate(NoteAppNav.MainMenu.name)
+                            }
+                        )
                     },
                     onCancel = {
                         navController.navigate(NoteAppNav.MainMenu.name)
@@ -143,13 +154,17 @@ fun NoteApp() {
                         authViewModel.showDialog(
                             content = context.getString(R.string.delete_confitmation),
                             onConfirm = {
-                                val success = authViewModel.deleteAccount(context)
-                                if (success) {
-                                    authViewModel.changeAuthFormState(AuthFormState.Login)
-                                    navController.navigate(NoteAppNav.Login.name)
-                                } else {
-                                    authViewModel.hideDialog()
-                                }
+                                authViewModel.deleteAccount(
+                                    currentUsername = uiState.user,
+                                    context = context,
+                                    onSuccess = {
+                                        authViewModel.changeAuthFormState(AuthFormState.Login)
+                                        navController.navigate(NoteAppNav.Login.name)
+                                    },
+                                    onFailed = {
+                                        authViewModel.hideDialog()
+                                    }
+                                )
                             }
                         )
                     },
