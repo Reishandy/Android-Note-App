@@ -158,6 +158,7 @@ fun AuthTextField(
     modifier: Modifier = Modifier
 ) {
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
+    if (!isPassword) passwordVisible = true
 
     OutlinedTextField(
         value = value,
@@ -188,7 +189,7 @@ fun AuthTextField(
         },
         isError = isError,
         visualTransformation = if (passwordVisible) VisualTransformation.None
-        else if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
+        else PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(
             imeAction = if (isLast) ImeAction.Done else ImeAction.Next,
             keyboardType = if (isPassword) KeyboardType.Password else KeyboardType.Text

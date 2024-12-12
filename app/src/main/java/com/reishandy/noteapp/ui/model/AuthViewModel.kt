@@ -44,7 +44,8 @@ class AuthViewModel : ViewModel() {
         private set
     var rePassword by mutableStateOf("")
         private set
-
+    
+    // UPDATE
     fun updateUsername(newUsername: String) {
         username = newUsername
     }
@@ -57,7 +58,7 @@ class AuthViewModel : ViewModel() {
         rePassword = newRePassword
     }
 
-    fun resetInput() {
+    private fun resetInput() {
         username = ""
         password = ""
         rePassword = ""
@@ -68,6 +69,9 @@ class AuthViewModel : ViewModel() {
         _uiState.update { state ->
             state.copy(
                 authFormState = authFormState,
+                usernameError = "",
+                passwordError = "",
+                rePasswordError = ""
             )
         }
     }
@@ -178,6 +182,7 @@ class AuthViewModel : ViewModel() {
         showToast(context, "Logged out successfully")
     }
 
+    // HELPER
     private fun showToast(context: Context, message: String) {
         Toast.makeText(
             context,
@@ -201,6 +206,7 @@ class AuthViewModel : ViewModel() {
         if (password.isEmpty() || rePassword.isEmpty()) {
             _uiState.update { state ->
                 state.copy(
+                    usernameError = "",
                     passwordError = if (password.isEmpty()) "Password is empty" else "",
                     rePasswordError = if (rePassword.isEmpty()) "Re-enter password is empty" else ""
                 )
@@ -210,14 +216,20 @@ class AuthViewModel : ViewModel() {
 
         if (password.length < 8) {
             _uiState.update { state ->
-                state.copy(passwordError = "Password must be at least 8 characters")
+                state.copy(
+                    passwordError = "Password must be at least 8 characters",
+                    rePasswordError = ""
+                )
             }
             return false
         }
 
         if (password != rePassword) {
             _uiState.update { state ->
-                state.copy(rePasswordError = "Password does not match")
+                state.copy(
+                    passwordError = "",
+                    rePasswordError = "Password does not match"
+                )
             }
             return false
         }
