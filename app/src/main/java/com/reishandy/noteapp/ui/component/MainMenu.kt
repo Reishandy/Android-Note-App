@@ -52,43 +52,39 @@ fun MainMenu(
     logoutOnClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Surface(
-        modifier = modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.surface
+    Column(
+        modifier = modifier.padding(dimensionResource(R.dimen.padding_large)),
+        verticalArrangement = Arrangement.SpaceBetween,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(
-            modifier = Modifier.padding(dimensionResource(R.dimen.padding_large)),
-            verticalArrangement = Arrangement.SpaceBetween,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = stringResource(R.string.app_name),
-                style = MaterialTheme.typography.displaySmall
-            )
+        Text(
+            text = stringResource(R.string.app_name),
+            style = MaterialTheme.typography.displaySmall
+        )
 
-            MainContent(
-                username = uiState.user,
-                onClick = onClick,
-                changeUsernameOnClick = changeUsernameOnClick,
-                changePasswordOnClick = changePasswordOnClick,
-                deleteAccountOnClick = deleteAccountOnClick,
-                logoutOnClick = logoutOnClick,
-            )
+        MainContent(
+            username = uiState.user,
+            onClick = onClick,
+            changeUsernameOnClick = changeUsernameOnClick,
+            changePasswordOnClick = changePasswordOnClick,
+            deleteAccountOnClick = deleteAccountOnClick,
+            logoutOnClick = logoutOnClick,
+        )
 
-            Text(
-                text = stringResource(R.string.author),
-                style = MaterialTheme.typography.bodyMedium
-            )
+        Text(
+            text = stringResource(R.string.author),
+            style = MaterialTheme.typography.bodyMedium
+        )
 
-            ConfirmDialog(
-                showDialog = uiState.showDialog,
-                content = uiState.dialogContent,
-                onConfirm = uiState.dialogOnConfirm,
-                onDismiss = uiState.dialogOnDismiss
-            )
-        }
+        ConfirmDialog(
+            showDialog = uiState.showDialog,
+            content = uiState.dialogContent,
+            onConfirm = uiState.dialogOnConfirm,
+            onDismiss = uiState.dialogOnDismiss
+        )
     }
 }
+
 
 @Composable
 fun ConfirmDialog(
@@ -327,13 +323,16 @@ fun IconElement(
 @Composable
 internal fun PreviewMainMenu() {
     NoteAppTheme(darkTheme = false) {
-        MainMenu(
-            uiState = AuthUiState(user = "username"),
-            onClick = { },
-            changeUsernameOnClick = { },
-            changePasswordOnClick = { },
-            deleteAccountOnClick = { },
-            logoutOnClick = { }
-        )
+        Surface(modifier = Modifier.fillMaxSize()) {
+            MainMenu(
+                uiState = AuthUiState(user = "username"),
+                onClick = { },
+                changeUsernameOnClick = { },
+                changePasswordOnClick = { },
+                deleteAccountOnClick = { },
+                logoutOnClick = { }
+            )
+        }
+
     }
 }

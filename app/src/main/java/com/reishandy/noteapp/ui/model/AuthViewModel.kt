@@ -103,16 +103,6 @@ class AuthViewModel : ViewModel() {
 
     // MAIN LOGIC
     fun login(context: Context): Boolean {
-        if (username.isEmpty() || password.isEmpty()) {
-            _uiState.update { state ->
-                state.copy(
-                    usernameError = if (username.isEmpty()) "Username is empty" else "",
-                    passwordError = if (password.isEmpty()) "Password is empty" else ""
-                )
-            }
-            return false
-        }
-
         // TODO: Implement login logic database
 
         _uiState.value = AuthUiState(user = username)
@@ -121,10 +111,6 @@ class AuthViewModel : ViewModel() {
     }
 
     fun register(context: Context): Boolean {
-        if (!validateUsername()) {
-            return false
-        }
-
         if (!validatePassword()) {
             return false
         }
@@ -137,10 +123,6 @@ class AuthViewModel : ViewModel() {
     }
 
     fun changeUsername(context: Context): Boolean {
-        if (!validateUsername()) {
-            return false
-        }
-
         // TODO: Implement change username logic database
 
         _uiState.value = AuthUiState(user = username)
@@ -191,29 +173,7 @@ class AuthViewModel : ViewModel() {
         ).show()
     }
 
-    private fun validateUsername(): Boolean {
-        if (username.isEmpty()) {
-            _uiState.update { state ->
-                state.copy(usernameError = "Username is empty")
-            }
-            return false
-        }
-
-        return true
-    }
-
     private fun validatePassword(): Boolean {
-        if (password.isEmpty() || rePassword.isEmpty()) {
-            _uiState.update { state ->
-                state.copy(
-                    usernameError = "",
-                    passwordError = if (password.isEmpty()) "Password is empty" else "",
-                    rePasswordError = if (rePassword.isEmpty()) "Re-enter password is empty" else ""
-                )
-            }
-            return false
-        }
-
         if (password.length < 8) {
             _uiState.update { state ->
                 state.copy(

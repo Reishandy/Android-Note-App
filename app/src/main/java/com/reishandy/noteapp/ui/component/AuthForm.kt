@@ -1,6 +1,7 @@
 package com.reishandy.noteapp.ui.component
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -54,97 +55,102 @@ fun AuthForm(
     onChange: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    Surface(
-        modifier = modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.surface
+    Column(
+        modifier = modifier.padding(dimensionResource(R.dimen.padding_extra)),
+        verticalArrangement = Arrangement.Center
     ) {
-        Column(
-            modifier = Modifier.padding(dimensionResource(R.dimen.padding_extra)),
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = stringResource(uiState.authFormState.title),
-                modifier = Modifier
-                    .fillMaxWidth(),
-                style = MaterialTheme.typography.displayMedium,
-                textAlign = TextAlign.Center
+        Text(
+            text = stringResource(uiState.authFormState.title),
+            modifier = Modifier
+                .fillMaxWidth(),
+            style = MaterialTheme.typography.displayMedium,
+            textAlign = TextAlign.Center
+        )
+
+        if (uiState.authFormState != AuthFormState.Password) {
+            AuthTextField(
+                value = usernameValue,
+                onValueChange = usernameOnValueChanged,
+                label = if (uiState.usernameError.isEmpty())
+                    stringResource(R.string.username) else uiState.usernameError,
+                isError = !uiState.usernameError.isEmpty(),
+                isPassword = false,
+                isLast = uiState.authFormState == AuthFormState.Username
             )
+        }
 
-            if (uiState.authFormState != AuthFormState.Password) {
-                AuthTextField(
-                    value = usernameValue,
-                    onValueChange = usernameOnValueChanged,
-                    label = if (uiState.usernameError.isEmpty())
-                        stringResource(R.string.username) else uiState.usernameError,
-                    isError = !uiState.usernameError.isEmpty(),
-                    isPassword = false,
-                    isLast = uiState.authFormState == AuthFormState.Username
-                )
-            }
+        if (uiState.authFormState != AuthFormState.Username) {
+            AuthTextField(
+                value = passwordValue,
+                onValueChange = passwordOnValueChanged,
+                label = if (uiState.passwordError.isEmpty())
+                    stringResource(R.string.password) else uiState.passwordError,
+                isError = !uiState.passwordError.isEmpty(),
+                isPassword = true,
+                isLast = uiState.authFormState == AuthFormState.Login
+            )
+        }
 
-            if (uiState.authFormState != AuthFormState.Username) {
-                AuthTextField(
-                    value = passwordValue,
-                    onValueChange = passwordOnValueChanged,
-                    label = if (uiState.passwordError.isEmpty())
-                        stringResource(R.string.password) else uiState.passwordError,
-                    isError = !uiState.passwordError.isEmpty(),
-                    isPassword = true,
-                    isLast = uiState.authFormState == AuthFormState.Login
-                )
-            }
+        if (uiState.authFormState == AuthFormState.Password ||
+            uiState.authFormState == AuthFormState.Register
+        ) {
+            AuthTextField(
+                value = rePasswordValue,
+                onValueChange = rePasswordOnValueChanged,
+                label = if (uiState.rePasswordError.isEmpty())
+                    stringResource(R.string.re_enter_password) else uiState.rePasswordError,
+                isError = !uiState.rePasswordError.isEmpty(),
+                isPassword = true,
+                isLast = true
+            )
+        }
 
-            if (uiState.authFormState == AuthFormState.Password ||
-                uiState.authFormState == AuthFormState.Register
+        Row(
+            modifier = Modifier
+                .padding(top = dimensionResource(R.dimen.padding_large))
+                .fillMaxWidth()
+        ) {
+            if (uiState.authFormState == AuthFormState.Username ||
+                uiState.authFormState == AuthFormState.Password
             ) {
-                AuthTextField(
-                    value = rePasswordValue,
-                    onValueChange = rePasswordOnValueChanged,
-                    label = if (uiState.rePasswordError.isEmpty())
-                        stringResource(R.string.re_enter_password) else uiState.rePasswordError,
-                    isError = !uiState.rePasswordError.isEmpty(),
-                    isPassword = true,
-                    isLast = true
-                )
-            }
-
-            Row(
-                modifier = Modifier
-                    .padding(top = dimensionResource(R.dimen.padding_large))
-                    .fillMaxWidth()
-            ) {
-                if (uiState.authFormState == AuthFormState.Username ||
-                    uiState.authFormState == AuthFormState.Password
-                ) {
-                    AuthButtons(
-                        label = stringResource(R.string.cancel),
-                        onClick = onCancel,
-                        modifier = Modifier.weight(1f)
-                    )
-
-                    Spacer(modifier = Modifier.weight(0.2f))
-                }
-
                 AuthButtons(
-                    label = stringResource(R.string.submit),
-                    onClick = onSubmit,
-                    modifier = Modifier.weight(1f)
+                    label = stringResource(R.string.cancel),
+                    onClick = onCancel,
+                    modifier = Modifier.weight(1f),
+                    enabled = true
                 )
+
+                Spacer(modifier = Modifier.weight(0.2f))
             }
 
-            if (uiState.authFormState == AuthFormState.Login) {
-                AuthTextButtons(
-                    label = stringResource(R.string.register_instead),
-                    onClick = onChange
-                )
-            } else if (uiState.authFormState == AuthFormState.Register) {
-                AuthTextButtons(
-                    label = stringResource(R.string.login_instead),
-                    onClick = onChange
-                )
-            }
+            AuthButtons(
+                label = stringResource(R.string.submit),
+                onClick = onSubmit,
+                enabled = when (uiState.authFormState) {
+                    AuthFormState.Login -> usernameValue.isNotEmpty() && passwordValue.isNotEmpty()
+                    AuthFormState.Register -> usernameValue.isNotEmpty() && passwordValue.isNotEmpty()
+                            && rePasswordValue.isNotEmpty()
+
+                    AuthFormState.Username -> usernameValue.isNotEmpty()
+                    AuthFormState.Password -> passwordValue.isNotEmpty() && rePasswordValue.isNotEmpty()
+                },
+                modifier = Modifier.weight(1f)
+            )
+        }
+
+        if (uiState.authFormState == AuthFormState.Login) {
+            AuthTextButtons(
+                label = stringResource(R.string.register_instead),
+                onClick = onChange
+            )
+        } else if (uiState.authFormState == AuthFormState.Register) {
+            AuthTextButtons(
+                label = stringResource(R.string.login_instead),
+                onClick = onChange
+            )
         }
     }
+
 }
 
 @Composable
@@ -202,12 +208,13 @@ fun AuthTextField(
 fun AuthButtons(
     label: String,
     onClick: () -> Unit,
+    enabled: Boolean,
     modifier: Modifier = Modifier
 ) {
     Button(
         onClick = onClick,
-        modifier = modifier
-            .fillMaxWidth()
+        modifier = modifier.fillMaxWidth(),
+        enabled = enabled
     ) {
         Text(label)
     }
@@ -221,8 +228,7 @@ fun AuthTextButtons(
 ) {
     TextButton(
         onClick = onClick,
-        modifier = modifier
-            .fillMaxWidth()
+        modifier = modifier.fillMaxWidth(),
     ) {
         Text(label)
     }
@@ -232,11 +238,13 @@ fun AuthTextButtons(
 @Composable
 fun AuthFormPreview() {
     NoteAppTheme {
-        AuthForm(
-            uiState = AuthUiState(
-                authFormState = AuthFormState.Register
-            ),
-            onSubmit = {}
-        )
+        Surface(modifier = Modifier.fillMaxSize()) {
+            AuthForm(
+                uiState = AuthUiState(
+                    authFormState = AuthFormState.Register
+                ),
+                onSubmit = {}
+            )
+        }
     }
 }

@@ -1,6 +1,5 @@
 package com.reishandy.noteapp.ui
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -10,7 +9,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -33,10 +31,10 @@ enum class NoteAppNav() {
 @Composable
 fun NoteApp() {
     val context = LocalContext.current
-    val viewModel: AuthViewModel = viewModel()
+    val authViewModel: AuthViewModel = viewModel()
     val navController: NavHostController = rememberNavController()
 
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by authViewModel.uiState.collectAsState()
 
     Surface(
         modifier = Modifier
@@ -50,18 +48,18 @@ fun NoteApp() {
             composable(route = NoteAppNav.Login.name) {
                 AuthForm(
                     uiState = uiState,
-                    usernameValue = viewModel.username,
-                    usernameOnValueChanged = { viewModel.updateUsername(it) },
-                    passwordValue = viewModel.password,
-                    passwordOnValueChanged = { viewModel.updatePassword(it) },
+                    usernameValue = authViewModel.username,
+                    usernameOnValueChanged = { authViewModel.updateUsername(it) },
+                    passwordValue = authViewModel.password,
+                    passwordOnValueChanged = { authViewModel.updatePassword(it) },
                     onSubmit = {
-                        val success = viewModel.login(context)
+                        val success = authViewModel.login(context)
                         if (success) {
                             navController.navigate(NoteAppNav.MainMenu.name)
                         }
                     },
                     onChange = {
-                        viewModel.changeAuthFormState(AuthFormState.Register)
+                        authViewModel.changeAuthFormState(AuthFormState.Register)
                         navController.navigate(NoteAppNav.Register.name)
                     }
                 )
@@ -70,20 +68,20 @@ fun NoteApp() {
             composable(route = NoteAppNav.Register.name) {
                 AuthForm(
                     uiState = uiState,
-                    usernameValue = viewModel.username,
-                    usernameOnValueChanged = { viewModel.updateUsername(it) },
-                    passwordValue = viewModel.password,
-                    passwordOnValueChanged = { viewModel.updatePassword(it) },
-                    rePasswordValue = viewModel.rePassword,
-                    rePasswordOnValueChanged = { viewModel.updateRePassword(it) },
+                    usernameValue = authViewModel.username,
+                    usernameOnValueChanged = { authViewModel.updateUsername(it) },
+                    passwordValue = authViewModel.password,
+                    passwordOnValueChanged = { authViewModel.updatePassword(it) },
+                    rePasswordValue = authViewModel.rePassword,
+                    rePasswordOnValueChanged = { authViewModel.updateRePassword(it) },
                     onSubmit = {
-                        val success = viewModel.register(context)
+                        val success = authViewModel.register(context)
                         if (success) {
                             navController.navigate(NoteAppNav.Login.name)
                         }
                     },
                     onChange = {
-                        viewModel.changeAuthFormState(AuthFormState.Login)
+                        authViewModel.changeAuthFormState(AuthFormState.Login)
                         navController.navigate(NoteAppNav.Login.name)
                     }
                 )
@@ -92,10 +90,10 @@ fun NoteApp() {
             composable(route = NoteAppNav.Username.name) {
                 AuthForm(
                     uiState = uiState,
-                    usernameValue = viewModel.username,
-                    usernameOnValueChanged = { viewModel.updateUsername(it) },
+                    usernameValue = authViewModel.username,
+                    usernameOnValueChanged = { authViewModel.updateUsername(it) },
                     onSubmit = {
-                        val success = viewModel.changeUsername(context)
+                        val success = authViewModel.changeUsername(context)
                         if (success) {
                             navController.navigate(NoteAppNav.MainMenu.name)
                         }
@@ -109,12 +107,12 @@ fun NoteApp() {
             composable(route = NoteAppNav.Password.name) {
                 AuthForm(
                     uiState = uiState,
-                    passwordValue = viewModel.password,
-                    passwordOnValueChanged = { viewModel.updatePassword(it) },
-                    rePasswordValue = viewModel.rePassword,
-                    rePasswordOnValueChanged = { viewModel.updateRePassword(it) },
+                    passwordValue = authViewModel.password,
+                    passwordOnValueChanged = { authViewModel.updatePassword(it) },
+                    rePasswordValue = authViewModel.rePassword,
+                    rePasswordOnValueChanged = { authViewModel.updateRePassword(it) },
                     onSubmit = {
-                        val success = viewModel.changePassword(context)
+                        val success = authViewModel.changePassword(context)
                         if (success) {
                             navController.navigate(NoteAppNav.MainMenu.name)
                         }
@@ -134,32 +132,32 @@ fun NoteApp() {
                         // TODO
                     },
                     changeUsernameOnClick = {
-                        viewModel.changeAuthFormState(AuthFormState.Username)
+                        authViewModel.changeAuthFormState(AuthFormState.Username)
                         navController.navigate(NoteAppNav.Username.name)
                     },
                     changePasswordOnClick = {
-                        viewModel.changeAuthFormState(AuthFormState.Password)
+                        authViewModel.changeAuthFormState(AuthFormState.Password)
                         navController.navigate(NoteAppNav.Password.name)
                     },
                     deleteAccountOnClick = {
-                        viewModel.showDialog(
+                        authViewModel.showDialog(
                             content = context.getString(R.string.delete_confitmation),
                             onConfirm = {
-                                val success = viewModel.deleteAccount(context)
+                                val success = authViewModel.deleteAccount(context)
                                 if (success) {
-                                    viewModel.changeAuthFormState(AuthFormState.Login)
+                                    authViewModel.changeAuthFormState(AuthFormState.Login)
                                     navController.navigate(NoteAppNav.Login.name)
                                 } else {
-                                    viewModel.hideDialog()
+                                    authViewModel.hideDialog()
                                 }
                             }
                         )
                     },
                     logoutOnClick = {
-                        viewModel.showDialog(
+                        authViewModel.showDialog(
                             content = context.getString(R.string.logout_confirmation),
                             onConfirm = {
-                                viewModel.logout(context)
+                                authViewModel.logout(context)
                                 navController.navigate(NoteAppNav.Login.name)
                             }
                         )
