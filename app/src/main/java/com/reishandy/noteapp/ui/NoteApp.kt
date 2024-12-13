@@ -1,5 +1,6 @@
 package com.reishandy.noteapp.ui
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Surface
@@ -13,6 +14,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.reishandy.noteapp.MainActivity
 import com.reishandy.noteapp.R
 import com.reishandy.noteapp.ui.component.AuthForm
 import com.reishandy.noteapp.ui.component.MainMenu
@@ -148,6 +150,11 @@ fun NoteApp() {
             composable(route = NoteAppNav.MainMenu.name) {
                 val context = LocalContext.current
 
+                BackHandler {
+                    // Exit the app when back button is pressed
+                    (context as? MainActivity)?.finish()
+                }
+
                 MainMenu(
                     uiState = authUiState,
                     onClick = {
@@ -193,6 +200,11 @@ fun NoteApp() {
             }
 
             composable(route = NoteAppNav.Note.name) {
+                BackHandler {
+                    noteViewModel.resetSelectedNote()
+                    navController.navigate(NoteAppNav.MainMenu.name)
+                }
+
                 NoteList(
                     uiState = noteUiState,
                     notes = noteUiState.notes,
