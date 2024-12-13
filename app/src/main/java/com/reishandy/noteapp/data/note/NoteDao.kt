@@ -17,9 +17,6 @@ interface NoteDao {
     @Query("UPDATE notes SET title = :title, subtitle = :subtitle, content = :content WHERE id = :id")
     suspend fun update(id: Long, title: String, subtitle: String, content: String)
 
-    @Query("SELECT * from notes WHERE id = :id")
-    suspend fun getNoteById(id: Long): Flow<Note>
-
     @Query("SELECT * from notes WHERE user_id = :username ORDER BY timestamp DESC")
-    suspend fun getAllNotesStream(username: String): Flow<List<Note>>
+    fun getAllNotesStream(username: String): Flow<List<Note>>
 }

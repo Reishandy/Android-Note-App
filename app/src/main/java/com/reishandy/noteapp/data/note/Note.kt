@@ -3,6 +3,7 @@ package com.reishandy.noteapp.data.note
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.reishandy.noteapp.data.user.User
 
@@ -15,7 +16,8 @@ import com.reishandy.noteapp.data.user.User
             childColumns = ["user_id"],
             onDelete = ForeignKey.CASCADE
         )
-    ]
+    ],
+    indices = [Index("user_id")]
 )
 data class Note(
     @PrimaryKey(autoGenerate = true)
