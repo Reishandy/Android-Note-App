@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.security.MessageDigest
+import kotlin.compareTo
 
 enum class AuthFormState(@StringRes val title: Int) {
     Login(title = R.string.LOGIN),
@@ -150,18 +151,7 @@ class AuthViewModel(database: NoteAppDatabase) : ViewModel() {
         }
 
         viewModelScope.launch {
-            try {
-                userDao.insert(
-                    User(
-                        username = username,
-                        password = hashPassword(password)
-                    )
-                )
-
-                changeAuthFormState(AuthFormState.Login)
-                showToast(context, "Account created successfully")
-                onSuccess()
-            } catch (e: SQLiteConstraintException) {
+            if (userDao.checkIfUserExists(username)) {
                 _uiState.update { state ->
                     state.copy(
                         usernameError = "Username already exists",
@@ -169,9 +159,20 @@ class AuthViewModel(database: NoteAppDatabase) : ViewModel() {
                         rePasswordError = ""
                     )
                 }
+                return@launch
             }
-        }
 
+            userDao.insert(
+                User(
+                    username = username,
+                    password = hashPassword(password)
+                )
+            )
+
+            changeAuthFormState(AuthFormState.Login)
+            showToast(context, "Account created successfully")
+            onSuccess()
+        }
     }
 
     fun changeUsername(
@@ -179,15 +180,19 @@ class AuthViewModel(database: NoteAppDatabase) : ViewModel() {
         context: Context,
         onSuccess: () -> Unit
     ) {
-        // TODO: Implement change username logic database
         viewModelScope.launch {
-            val user = userDao.getUser(currentUsername)
-
-            if (user == null) {
-                showToast(context, "Something went wrong")
-                onSuccess()
+            if (userDao.checkIfUserExists(username)) {
+                _uiState.update { state ->
+                    state.copy(
+                        usernameError = "Username already exists",
+                        passwordError = "",
+                        rePasswordError = ""
+                    )
+                }
                 return@launch
             }
+
+            val user = userDao.getUser(currentUsername)
 
             userDao.update(
                 oldUsername = user.username,
@@ -210,15 +215,8 @@ class AuthViewModel(database: NoteAppDatabase) : ViewModel() {
             return
         }
 
-        // TODO: Implement change password logic database
         viewModelScope.launch {
             val user = userDao.getUser(currentUsername)
-
-            if (user == null) {
-                showToast(context, "Something went wrong")
-                onSuccess()
-                return@launch
-            }
 
             userDao.update(
                 oldUsername = user.username,
@@ -261,14 +259,6 @@ class AuthViewModel(database: NoteAppDatabase) : ViewModel() {
     }
 
     // HELPER
-    private fun showToast(context: Context, message: String) {
-        Toast.makeText(
-            context,
-            message,
-            Toast.LENGTH_SHORT
-        ).show()
-    }
-
     private fun validatePassword(): Boolean {
         if (password.length < 8) {
             _uiState.update { state ->
@@ -291,12 +281,5 @@ class AuthViewModel(database: NoteAppDatabase) : ViewModel() {
         }
 
         return true
-    }
-
-    fun hashPassword(password: String): String {
-        val bytes = password.toByteArray()
-        val md = MessageDigest.getInstance("SHA-256")
-        val digest = md.digest(bytes)
-        return digest.fold("") { str, it -> str + "%02x".format(it) }
     }
 }

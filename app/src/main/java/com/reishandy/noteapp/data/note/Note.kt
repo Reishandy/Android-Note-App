@@ -2,23 +2,9 @@ package com.reishandy.noteapp.data.note
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.ForeignKey
-import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.reishandy.noteapp.data.user.User
 
-@Entity(
-    tableName = "notes",
-    foreignKeys = [
-        ForeignKey(
-            entity = User::class,
-            parentColumns = ["username"],
-            childColumns = ["user_id"],
-            onDelete = ForeignKey.CASCADE
-        )
-    ],
-    indices = [Index("user_id")]
-)
+@Entity(tableName = "notes")
 data class Note(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")

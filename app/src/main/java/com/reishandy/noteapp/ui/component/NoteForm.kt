@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -38,7 +40,9 @@ fun NoteForm(
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier.padding(dimensionResource(R.dimen.padding_large)),
+        modifier = modifier
+            .padding(dimensionResource(R.dimen.large))
+            .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Center
     ) {
         Text(
@@ -53,7 +57,7 @@ fun NoteForm(
             onValueChange = titleOnValueChanged,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = dimensionResource(R.dimen.padding_medium)),
+                .padding(top = dimensionResource(R.dimen.medium)),
             label = { Text(text = stringResource(R.string.title)) },
             keyboardOptions = KeyboardOptions.Default.copy(
                 imeAction = ImeAction.Next
@@ -66,7 +70,7 @@ fun NoteForm(
             onValueChange = subtitleOnValueChanged,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = dimensionResource(R.dimen.padding_medium)),
+                .padding(top = dimensionResource(R.dimen.medium)),
             label = { Text(text = stringResource(R.string.subtitle)) },
             keyboardOptions = KeyboardOptions.Default.copy(
                 imeAction = ImeAction.Next
@@ -79,7 +83,7 @@ fun NoteForm(
             onValueChange = contentOnValueChanged,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = dimensionResource(R.dimen.padding_medium)),
+                .padding(top = dimensionResource(R.dimen.medium)),
             label = { Text(text = stringResource(R.string.content)) },
             keyboardOptions = KeyboardOptions.Default.copy(
                 imeAction = ImeAction.Done
@@ -89,7 +93,7 @@ fun NoteForm(
 
         Row(
             modifier = Modifier
-                .padding(top = dimensionResource(R.dimen.padding_large))
+                .padding(top = dimensionResource(R.dimen.large))
                 .fillMaxWidth(),
         ) {
             Button(

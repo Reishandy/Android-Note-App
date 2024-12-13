@@ -26,12 +26,15 @@
     <string name="my_github">My GitHub</string>
     <string name="my_linkedin">My LinkedIn</string>
     <string name="my_instagram">My Instagram</string>
-    <string name="delete_confitmation">Are you sure you want to delete your account?</string>
+    <string name="delete_confirmation">Are you sure you want to delete your account?</string>
     <string name="logout_confirmation">Are you sure you want to logout?</string>
 
     <string name="note_add">Add Note</string>
     <string name="note_edit">Edit Note</string>
+    <string name="note_delete">Delete Note</string>
+    <string name="note_delete_confirmation">Are you sure you want to delete this note?</string>
     <string name="title">Title</string>
     <string name="subtitle">Sub-Title</string>
     <string name="content">Content</string>
+    <string name="note_empty">Oops!\n Your note is empty.\n Tap + to add a new note.</string>
 </resources>

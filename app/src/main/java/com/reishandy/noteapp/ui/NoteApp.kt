@@ -1,8 +1,7 @@
 package com.reishandy.noteapp.ui
 
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -18,6 +17,7 @@ import com.reishandy.noteapp.R
 import com.reishandy.noteapp.ui.component.AuthForm
 import com.reishandy.noteapp.ui.component.MainMenu
 import com.reishandy.noteapp.ui.component.NoteForm
+import com.reishandy.noteapp.ui.component.NoteList
 import com.reishandy.noteapp.ui.model.AuthFormState
 import com.reishandy.noteapp.ui.model.AuthViewModel
 import com.reishandy.noteapp.ui.model.AuthViewModelFactory
@@ -47,8 +47,8 @@ fun NoteApp() {
 
     Surface(
         modifier = Modifier
+            .statusBarsPadding()
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
     ) {
         NavHost(
             navController = navController,
@@ -110,6 +110,10 @@ fun NoteApp() {
                             currentUsername = authUiState.user,
                             context = context,
                             onSuccess = {
+                                noteViewModel.changeUsername(
+                                    oldUsername = authUiState.user,
+                                    newUsername = authViewModel.username
+                                )
                                 navController.navigate(NoteAppNav.MainMenu.name)
                             }
                         )
@@ -148,8 +152,8 @@ fun NoteApp() {
                 MainMenu(
                     uiState = authUiState,
                     onClick = {
-                        // TODO
-                        navController.navigate(NoteAppNav.AddNote.name)
+                        noteViewModel.initNotes(authUiState.user)
+                        navController.navigate(NoteAppNav.Note.name)
                     },
                     changeUsernameOnClick = {
                         authViewModel.changeAuthFormState(AuthFormState.Username)
@@ -161,7 +165,7 @@ fun NoteApp() {
                     },
                     deleteAccountOnClick = {
                         authViewModel.showDialog(
-                            content = context.getString(R.string.delete_confitmation),
+                            content = context.getString(R.string.delete_confirmation),
                             onConfirm = {
                                 authViewModel.deleteAccount(
                                     currentUsername = authUiState.user,
@@ -190,7 +194,45 @@ fun NoteApp() {
             }
 
             composable(route = NoteAppNav.Note.name) {
-                // TODO
+                NoteList(
+                    uiState = noteUiState,
+                    notes = noteUiState.notes,
+                    onSelected = { selectedNote ->
+                        if (noteUiState.selectedNote == selectedNote) {
+                            noteViewModel.resetSelectedNote()
+                        } else {
+                            noteViewModel.updateSelectedNote(selectedNote)
+                        }
+                    },
+                    onAdd = {
+                        navController.navigate(NoteAppNav.AddNote.name)
+                    },
+                    onEdit = {
+                        noteViewModel.updateAll(
+                            title = noteUiState.selectedNote?.title ?: "",
+                            subtitle = noteUiState.selectedNote?.subtitle ?: "",
+                            content = noteUiState.selectedNote?.content ?: ""
+                        )
+                        navController.navigate(NoteAppNav.EditNote.name)
+                    },
+                    onDelete = {
+                        noteViewModel.showDialog()
+                    },
+                    onDeleteDialog = {
+                        noteViewModel.deleteNote(
+                            onSuccess = {
+                                noteViewModel.hideDialog()
+                            },
+                            context = context
+                        )
+                    },
+                    onDismissDialog = {
+                        noteViewModel.hideDialog()
+                    },
+                    onBack = {
+                        navController.navigate(NoteAppNav.MainMenu.name)
+                    }
+                )
             }
 
             composable(route = NoteAppNav.AddNote.name) {
@@ -203,7 +245,14 @@ fun NoteApp() {
                     contentValue = noteViewModel.content,
                     contentOnValueChanged = { noteViewModel.updateContent(it) },
                     onSubmit = {
-                        // TODO
+                        noteViewModel.addNote(
+                            username = authUiState.user,
+                            onSuccess = {
+                                noteViewModel.resetInput()
+                                navController.navigate(NoteAppNav.Note.name)
+                            },
+                            context = context
+                        )
                     },
                     onCancel = {
                         noteViewModel.resetInput()
@@ -222,7 +271,13 @@ fun NoteApp() {
                     contentValue = noteViewModel.content,
                     contentOnValueChanged = { noteViewModel.updateContent(it) },
                     onSubmit = {
-                        // TODO
+                        noteViewModel.updateNote(
+                            onSuccess = {
+                                noteViewModel.resetInput()
+                                navController.navigate(NoteAppNav.Note.name)
+                            },
+                            context = context
+                        )
                     },
                     onCancel = {
                         noteViewModel.resetInput()

@@ -9,7 +9,7 @@ import com.reishandy.noteapp.data.note.NoteDao
 import com.reishandy.noteapp.data.user.User
 import com.reishandy.noteapp.data.user.UserDao
 
-@Database(entities = [User::class, Note::class], version = 2, exportSchema = false)
+@Database(entities = [User::class, Note::class], version = 3, exportSchema = false)
 abstract class NoteAppDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
     abstract fun noteDao(): NoteDao

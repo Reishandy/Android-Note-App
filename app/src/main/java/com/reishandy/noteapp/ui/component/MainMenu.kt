@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.AccountCircle
@@ -53,7 +55,9 @@ fun MainMenu(
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier.padding(dimensionResource(R.dimen.padding_large)),
+        modifier = modifier
+            .padding(dimensionResource(R.dimen.large))
+            .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -115,7 +119,7 @@ fun ConfirmDialog(
                         onConfirm()
                         onDismiss()
                     },
-                    modifier = Modifier.padding(dimensionResource(R.dimen.padding_small)),
+                    modifier = Modifier.padding(dimensionResource(R.dimen.small)),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.error
                     )
@@ -129,7 +133,7 @@ fun ConfirmDialog(
             dismissButton = {
                 Button(
                     onClick = onDismiss,
-                    modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))
+                    modifier = Modifier.padding(dimensionResource(R.dimen.small))
                 ) {
                     Text(
                         text = stringResource(R.string.cancel),
@@ -162,13 +166,13 @@ fun MainContent(
         Button(
             onClick = onClick,
             modifier = Modifier
-                .padding(vertical = dimensionResource(R.dimen.padding_extra))
+                .padding(vertical = dimensionResource(R.dimen.extra_large))
                 .fillMaxWidth(),
             shape = MaterialTheme.shapes.medium
         ) {
             Text(
                 text = stringResource(R.string.note_button),
-                modifier = Modifier.padding(vertical = dimensionResource(R.dimen.padding_medium)),
+                modifier = Modifier.padding(vertical = dimensionResource(R.dimen.medium)),
                 style = MaterialTheme.typography.titleLarge
             )
         }
@@ -189,11 +193,11 @@ fun WelcomeCard(
     modifier: Modifier = Modifier
 ) {
     Card(
-        elevation = CardDefaults.cardElevation(dimensionResource(R.dimen.padding_small))
+        elevation = CardDefaults.cardElevation(dimensionResource(R.dimen.small))
     ) {
         Column(
             modifier = modifier
-                .padding(dimensionResource(R.dimen.padding_large))
+                .padding(dimensionResource(R.dimen.large))
                 .fillMaxWidth(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
@@ -203,7 +207,7 @@ fun WelcomeCard(
                 style = MaterialTheme.typography.displayMedium
             )
 
-            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.small)))
 
             Text(
                 text = username,
@@ -250,7 +254,7 @@ fun IconGrid(
             )
         }
 
-        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_medium)))
+        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.medium)))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -292,7 +296,7 @@ fun IconElement(
 
     Column(
         modifier = modifier
-            .padding(dimensionResource(R.dimen.padding_small))
+            .padding(dimensionResource(R.dimen.small))
             .clickable {
                 url?.let {
                     val intent = Intent(Intent.ACTION_VIEW, Uri.parse(it))
@@ -304,13 +308,13 @@ fun IconElement(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            modifier = Modifier.size(dimensionResource(R.dimen.padding_extra)),
+            modifier = Modifier.size(dimensionResource(R.dimen.extra_large)),
             tint = MaterialTheme.colorScheme.secondary
         )
 
         Text(
             text = label,
-            modifier = Modifier.width(dimensionResource(R.dimen.padding_plus)),
+            modifier = Modifier.width(dimensionResource(R.dimen.plus)),
             style = MaterialTheme.typography.labelLarge,
             maxLines = 2,
             textAlign = TextAlign.Center

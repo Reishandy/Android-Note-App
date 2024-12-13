@@ -1,5 +1,6 @@
 package com.reishandy.noteapp.ui.model
 
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -44,13 +45,24 @@ class NoteViewModel(database: NoteAppDatabase) : ViewModel() {
         content = newContent
     }
 
+    fun updateAll(title: String, subtitle: String, content: String) {
+        this.title = title
+        this.subtitle = subtitle
+        this.content = content
+    }
+
     fun resetInput() {
         title = ""
         subtitle = ""
         content = ""
     }
+
     fun updateSelectedNote(note: Note) {
         _uiState.update { it.copy(selectedNote = note) }
+    }
+
+    fun resetSelectedNote() {
+        _uiState.update { it.copy(selectedNote = null) }
     }
 
     fun showDialog() {
@@ -70,7 +82,11 @@ class NoteViewModel(database: NoteAppDatabase) : ViewModel() {
         }
     }
 
-    fun addNote(username: String) {
+    fun addNote(
+        username: String,
+        onSuccess: () -> Unit,
+        context: Context
+    ) {
         viewModelScope.launch {
             noteDao.insert(
                 Note(
@@ -80,25 +96,45 @@ class NoteViewModel(database: NoteAppDatabase) : ViewModel() {
                     userId = username
                 )
             )
+            showToast(context, "Note added")
+            onSuccess()
         }
     }
 
-    fun updateNote() {
+    fun updateNote(
+        onSuccess: () -> Unit,
+        context: Context
+    ) {
         viewModelScope.launch {
             val selectedNote = _uiState.value.selectedNote ?: return@launch
             noteDao.update(
-                selectedNote.id,
-                title,
-                subtitle,
-                content
+                id = selectedNote.id,
+                title = title,
+                subtitle = subtitle,
+                content = content,
+                timestamp = System.currentTimeMillis()
             )
+            showToast(context, "Note $title updated")
+            onSuccess()
         }
     }
 
-    fun deleteNote() {
+    fun deleteNote(
+        onSuccess: () -> Unit,
+        context: Context
+    ) {
         viewModelScope.launch {
             val selectedNote = _uiState.value.selectedNote ?: return@launch
             noteDao.delete(selectedNote)
+            showToast(context, "Note ${selectedNote.title} deleted")
+            onSuccess()
+        }
+    }
+
+    // AUTH HELPER
+    fun changeUsername(oldUsername: String, newUsername: String) {
+        viewModelScope.launch {
+            noteDao.changeUsername(oldUsername, newUsername)
         }
     }
 }
