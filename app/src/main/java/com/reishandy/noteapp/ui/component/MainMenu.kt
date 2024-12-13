@@ -162,12 +162,16 @@ fun MainContent(
         WelcomeCard(
             username = username
         )
+        IconGrid(
+            changeUsernameOnClick = changeUsernameOnClick,
+            changePasswordOnClick = changePasswordOnClick,
+            deleteAccountOnClick = deleteAccountOnClick,
+            logoutOnClick = logoutOnClick
+        )
 
         Button(
             onClick = onClick,
-            modifier = Modifier
-                .padding(vertical = dimensionResource(R.dimen.extra_large))
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.medium
         ) {
             Text(
@@ -176,13 +180,6 @@ fun MainContent(
                 style = MaterialTheme.typography.titleLarge
             )
         }
-
-        IconGrid(
-            changeUsernameOnClick = changeUsernameOnClick,
-            changePasswordOnClick = changePasswordOnClick,
-            deleteAccountOnClick = deleteAccountOnClick,
-            logoutOnClick = logoutOnClick
-        )
     }
 }
 
@@ -226,7 +223,7 @@ fun IconGrid(
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier
+        modifier = modifier.padding(vertical = dimensionResource(R.dimen.extra_large))
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
