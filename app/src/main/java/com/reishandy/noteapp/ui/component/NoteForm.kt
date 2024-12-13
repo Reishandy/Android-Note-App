@@ -85,10 +85,7 @@ fun NoteForm(
                 .fillMaxWidth()
                 .padding(top = dimensionResource(R.dimen.medium)),
             label = { Text(text = stringResource(R.string.content)) },
-            keyboardOptions = KeyboardOptions.Default.copy(
-                imeAction = ImeAction.Done
-            ),
-            minLines = 5,
+            minLines = 5
         )
 
         Row(

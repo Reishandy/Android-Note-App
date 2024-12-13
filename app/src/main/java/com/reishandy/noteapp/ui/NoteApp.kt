@@ -255,7 +255,7 @@ fun NoteApp() {
                     },
                     onCancel = {
                         noteViewModel.resetInput()
-                        navController.navigate(NoteAppNav.MainMenu.name)
+                        navController.navigate(NoteAppNav.Note.name)
                     }
                 )
             }
@@ -280,7 +280,7 @@ fun NoteApp() {
                     },
                     onCancel = {
                         noteViewModel.resetInput()
-                        navController.navigate(NoteAppNav.MainMenu.name)
+                        navController.navigate(NoteAppNav.Note.name)
                     }
                 )
             }
