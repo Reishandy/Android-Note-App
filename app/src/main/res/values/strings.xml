@@ -7,25 +7,31 @@
     <string name="NEW_USERNAME">NEW USERNAME</string>
     <string name="NEW_PASSWORD">NEW PASSWORD</string>
 
-    <string name="username">username</string>
-    <string name="password">password</string>
-    <string name="re_enter_password">re-enter password</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="re_enter_password">Re-enter password</string>
     <string name="cancel">Cancel</string>
     <string name="submit">Submit</string>
+    <string name="confirm">Confirm</string>
+    <string name="logout">Logout</string>
     <string name="register_instead">Don\'t have an account yet?</string>
     <string name="login_instead">Already have an account?</string>
 
     <string name="welcome">Welcome!</string>
     <string name="note_button">Go to Note App</string>
-    <string name="confirm">Confirm</string>
     <string name="change_username">Change username</string>
     <string name="change_password">Change password</string>
     <string name="delete_account">Delete account</string>
-    <string name="logout">Logout</string>
     <string name="my_website">My Website</string>
     <string name="my_github">My GitHub</string>
     <string name="my_linkedin">My LinkedIn</string>
     <string name="my_instagram">My Instagram</string>
     <string name="delete_confitmation">Are you sure you want to delete your account?</string>
     <string name="logout_confirmation">Are you sure you want to logout?</string>
+
+    <string name="note_add">Add Note</string>
+    <string name="note_edit">Edit Note</string>
+    <string name="title">Title</string>
+    <string name="subtitle">Sub-Title</string>
+    <string name="content">Content</string>
 </resources>

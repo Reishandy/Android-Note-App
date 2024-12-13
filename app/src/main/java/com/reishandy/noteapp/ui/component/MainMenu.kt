@@ -322,7 +322,7 @@ fun IconElement(
 @Preview
 @Composable
 internal fun PreviewMainMenu() {
-    NoteAppTheme(darkTheme = false) {
+    NoteAppTheme(darkTheme = true) {
         Surface(modifier = Modifier.fillMaxSize()) {
             MainMenu(
                 uiState = AuthUiState(user = "username"),

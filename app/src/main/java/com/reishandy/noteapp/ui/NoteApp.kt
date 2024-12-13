@@ -17,25 +17,33 @@ import androidx.navigation.compose.rememberNavController
 import com.reishandy.noteapp.R
 import com.reishandy.noteapp.ui.component.AuthForm
 import com.reishandy.noteapp.ui.component.MainMenu
+import com.reishandy.noteapp.ui.component.NoteForm
 import com.reishandy.noteapp.ui.model.AuthFormState
 import com.reishandy.noteapp.ui.model.AuthViewModel
 import com.reishandy.noteapp.ui.model.AuthViewModelFactory
+import com.reishandy.noteapp.ui.model.NoteViewModel
+import com.reishandy.noteapp.ui.model.NoteViewModelFactory
 
 enum class NoteAppNav() {
     Login,
     Register,
     Username,
     Password,
-    MainMenu
+    MainMenu,
+    Note,
+    AddNote,
+    EditNote
 }
 
 @Composable
 fun NoteApp() {
     val context = LocalContext.current
     val authViewModel: AuthViewModel = viewModel(factory = AuthViewModelFactory(context))
+    val noteViewModel: NoteViewModel = viewModel(factory = NoteViewModelFactory(context))
     val navController: NavHostController = rememberNavController()
 
-    val uiState by authViewModel.uiState.collectAsState()
+    val authUiState by authViewModel.uiState.collectAsState()
+    val noteUiState by noteViewModel.uiState.collectAsState()
 
     Surface(
         modifier = Modifier
@@ -48,7 +56,7 @@ fun NoteApp() {
         ) {
             composable(route = NoteAppNav.Login.name) {
                 AuthForm(
-                    uiState = uiState,
+                    uiState = authUiState,
                     usernameValue = authViewModel.username,
                     usernameOnValueChanged = { authViewModel.updateUsername(it) },
                     passwordValue = authViewModel.password,
@@ -70,7 +78,7 @@ fun NoteApp() {
 
             composable(route = NoteAppNav.Register.name) {
                 AuthForm(
-                    uiState = uiState,
+                    uiState = authUiState,
                     usernameValue = authViewModel.username,
                     usernameOnValueChanged = { authViewModel.updateUsername(it) },
                     passwordValue = authViewModel.password,
@@ -94,12 +102,12 @@ fun NoteApp() {
 
             composable(route = NoteAppNav.Username.name) {
                 AuthForm(
-                    uiState = uiState,
+                    uiState = authUiState,
                     usernameValue = authViewModel.username,
                     usernameOnValueChanged = { authViewModel.updateUsername(it) },
                     onSubmit = {
                         authViewModel.changeUsername(
-                            currentUsername = uiState.user,
+                            currentUsername = authUiState.user,
                             context = context,
                             onSuccess = {
                                 navController.navigate(NoteAppNav.MainMenu.name)
@@ -114,14 +122,14 @@ fun NoteApp() {
 
             composable(route = NoteAppNav.Password.name) {
                 AuthForm(
-                    uiState = uiState,
+                    uiState = authUiState,
                     passwordValue = authViewModel.password,
                     passwordOnValueChanged = { authViewModel.updatePassword(it) },
                     rePasswordValue = authViewModel.rePassword,
                     rePasswordOnValueChanged = { authViewModel.updateRePassword(it) },
                     onSubmit = {
                         authViewModel.changePassword(
-                            currentUsername = uiState.user,
+                            currentUsername = authUiState.user,
                             context = context,
                             onSuccess = {
                                 navController.navigate(NoteAppNav.MainMenu.name)
@@ -138,9 +146,10 @@ fun NoteApp() {
                 val context = LocalContext.current
 
                 MainMenu(
-                    uiState = uiState,
+                    uiState = authUiState,
                     onClick = {
                         // TODO
+                        navController.navigate(NoteAppNav.AddNote.name)
                     },
                     changeUsernameOnClick = {
                         authViewModel.changeAuthFormState(AuthFormState.Username)
@@ -155,7 +164,7 @@ fun NoteApp() {
                             content = context.getString(R.string.delete_confitmation),
                             onConfirm = {
                                 authViewModel.deleteAccount(
-                                    currentUsername = uiState.user,
+                                    currentUsername = authUiState.user,
                                     context = context,
                                     onSuccess = {
                                         authViewModel.changeAuthFormState(AuthFormState.Login)
@@ -176,6 +185,48 @@ fun NoteApp() {
                                 navController.navigate(NoteAppNav.Login.name)
                             }
                         )
+                    }
+                )
+            }
+
+            composable(route = NoteAppNav.Note.name) {
+                // TODO
+            }
+
+            composable(route = NoteAppNav.AddNote.name) {
+                NoteForm(
+                    header = R.string.note_add,
+                    titleValue = noteViewModel.title,
+                    titleOnValueChanged = { noteViewModel.updateTitle(it) },
+                    subtitleValue = noteViewModel.subtitle,
+                    subtitleOnValueChanged = { noteViewModel.updateSubtitle(it) },
+                    contentValue = noteViewModel.content,
+                    contentOnValueChanged = { noteViewModel.updateContent(it) },
+                    onSubmit = {
+                        // TODO
+                    },
+                    onCancel = {
+                        noteViewModel.resetInput()
+                        navController.navigate(NoteAppNav.MainMenu.name)
+                    }
+                )
+            }
+
+            composable(route = NoteAppNav.EditNote.name) {
+                NoteForm(
+                    header = R.string.note_edit,
+                    titleValue = noteViewModel.title,
+                    titleOnValueChanged = { noteViewModel.updateTitle(it) },
+                    subtitleValue = noteViewModel.subtitle,
+                    subtitleOnValueChanged = { noteViewModel.updateSubtitle(it) },
+                    contentValue = noteViewModel.content,
+                    contentOnValueChanged = { noteViewModel.updateContent(it) },
+                    onSubmit = {
+                        // TODO
+                    },
+                    onCancel = {
+                        noteViewModel.resetInput()
+                        navController.navigate(NoteAppNav.MainMenu.name)
                     }
                 )
             }

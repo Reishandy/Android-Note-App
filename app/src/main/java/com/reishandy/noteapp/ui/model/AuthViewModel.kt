@@ -2,27 +2,21 @@ package com.reishandy.noteapp.ui.model
 
 import android.content.Context
 import android.database.sqlite.SQLiteConstraintException
-import android.util.Log
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.reishandy.noteapp.R
 import com.reishandy.noteapp.data.NoteAppDatabase
 import com.reishandy.noteapp.data.user.User
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.CompletableJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.compose
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.security.MessageDigest
 
 enum class AuthFormState(@StringRes val title: Int) {
@@ -262,6 +256,7 @@ class AuthViewModel(database: NoteAppDatabase) : ViewModel() {
 
     fun logout(context: Context) {
         _uiState.value = AuthUiState()
+        resetInput()
         showToast(context, "Logged out successfully")
     }
 

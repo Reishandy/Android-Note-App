@@ -61,8 +61,7 @@ fun AuthForm(
     ) {
         Text(
             text = stringResource(uiState.authFormState.title),
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             style = MaterialTheme.typography.displayMedium,
             textAlign = TextAlign.Center
         )
