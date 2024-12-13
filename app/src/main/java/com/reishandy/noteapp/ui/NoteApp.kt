@@ -46,13 +46,12 @@ fun NoteApp() {
     val noteUiState by noteViewModel.uiState.collectAsState()
 
     Surface(
-        modifier = Modifier
-            .statusBarsPadding()
-            .fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
         NavHost(
             navController = navController,
-            startDestination = NoteAppNav.Login.name
+            startDestination = NoteAppNav.Login.name,
+            modifier = Modifier.statusBarsPadding()
         ) {
             composable(route = NoteAppNav.Login.name) {
                 AuthForm(
