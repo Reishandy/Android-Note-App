@@ -54,7 +54,7 @@ class AuthViewModel(database: NoteAppDatabase) : ViewModel() {
 
     // UPDATE
     fun updateUsername(newUsername: String) {
-        username = newUsername
+        username = newUsername.replace("\\s".toRegex(), "") // Remove any whitespace
     }
 
     fun updatePassword(newPassword: String) {
